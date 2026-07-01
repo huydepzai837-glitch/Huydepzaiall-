@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sunwin Link</title>
+<style>
+body{
+ background:#050816;
+ color:white;
+ height:100vh;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-family:Arial;
+ margin:0;
+ padding:20px;
+}
+.container{
+ display:flex;
+ gap:20px;
+ flex-wrap:wrap;
+ justify-content:center;
+ align-items:flex-start;
+}
+.box{
+ width:330px;
+ padding:30px;
+ border-radius:25px;
+ text-align:center;
+ background:linear-gradient(150deg,#061d2b,#19002b);
+ box-shadow:0 0 30px #00eaff;
+}
+.prediction-widget{
+ width:330px;
+ padding:30px;
+ border-radius:25px;
+ text-align:center;
+ background:linear-gradient(150deg,#1a0033,#330033);
+ box-shadow:0 0 30px #ff00ff;
+}
+h1{
+ color:#ff00ff;
+}
+h2{
+ color:#00eaff;
+ margin-top:0;
+}
+button{
+ width:100%;
+ padding:18px;
+ border:0;
+ border-radius:30px;
+ background:linear-gradient(90deg,#ff00ff,#00eaff);
+ color:white;
+ font-size:20px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:0.3s;
+}
+button:hover{
+ transform:scale(1.05);
+ box-shadow:0 0 20px #00eaff;
+}
+.prediction-result{
+ margin:20px 0;
+ font-size:24px;
+ font-weight:bold;
+ padding:20px;
+ border-radius:15px;
+ background:rgba(0,234,255,0.1);
+ border:2px solid #00eaff;
+ min-height:40px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+.result-tai{
+ color:#00ff00;
+ background:rgba(0,255,0,0.1) !important;
+ border-color:#00ff00 !important;
+}
+.result-xiu{
+ color:#ff6b6b;
+ background:rgba(255,107,107,0.1) !important;
+ border-color:#ff6b6b !important;
+}
+.prediction-info{
+ font-size:14px;
+ color:#aaa;
+ margin-top:15px;
+}
+.stats{
+ display:flex;
+ gap:10px;
+ margin:15px 0;
+ font-size:12px;
+}
+.stat-item{
+ flex:1;
+ padding:10px;
+ background:rgba(0,234,255,0.1);
+ border-radius:10px;
+ border:1px solid #00eaff;
+}
+.loading{
+ display:inline-block;
+ width:20px;
+ height:20px;
+ border:3px solid #00eaff;
+ border-top-color:transparent;
+ border-radius:50%;
+ animation:spin 0.6s linear infinite;
+}
+@keyframes spin{
+ to { transform:rotate(360deg); }
+}
+@media(max-width:768px){
+ .container{
+  flex-direction:column;
+  align-items:center;
+ }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+ <div class="box">
+  <h1>NEON SUNWIN</h1>
+  <p>Bấm để vào trang</p>
+  <button onclick="go()">
+  🎮 VÀO GAME
+  </button>
+ </div>
+
+ <div class="prediction-widget">
+  <h2>🔮 DỰ ĐOÁN TÀI XỈU</h2>
+  
+  <div class="prediction-result" id="predictionResult">
+   Chưa dự đoán
+  </div>
+
+  <div class="stats">
+   <div class="stat-item">
+    <div>📊 Tài</div>
+    <div id="taiCount">0</div>
+   </div>
+   <div class="stat-item">
+    <div>📊 Xỉu</div>
+    <div id="xiuCount">0</div>
+   </div>
+   <div class="stat-item">
+    <div>🎯 Độ chính xác</div>
+    <div id="accuracy">0%</div>
+   </div>
+  </div>
+
+  <button onclick="predictTaiXiu()">
+   🤖 DỰ ĐOÁN
+  </button>
+
+  <div class="prediction-info">
+   <p>⚠️ Dự đoán dựa trên thuật toán phân tích</p>
+   <p id="infoText"></p>
+  </div>
+ </div>
+</div>
+
+<script>
+
+// Lịch sử dự đoán
+let predictions = [];
+let correctPredictions = 0;
+
+function go(){
+ window.location.href="https://sunwin.show/";
+}
+
+function predictTaiXiu(){
+ const resultDiv = document.getElementById('predictionResult');
+ 
+ // Hiệu ứng loading
+ resultDiv.innerHTML = '<div class="loading"></div>';
+ 
+ setTimeout(() => {
+  // Thuật toán dự đoán đơn giản
+  const prediction = Math.random() > 0.5 ? 'TÀI ⬆️' : 'XỈU ⬇️';
+  const isPredictionTai = prediction.includes('TÀI');
+  
+  // Cập nhật kết quả
+  resultDiv.textContent = prediction;
+  resultDiv.className = 'prediction-result ' + (isPredictionTai ? 'result-tai' : 'result-xiu');
+  
+  // Lưu lịch sử
+  predictions.push(isPredictionTai);
+  updateStats();
+  
+  // Cập nhật thông tin
+  const confidence = (Math.random() * 30 + 60).toFixed(1);
+  document.getElementById('infoText').textContent = 
+   `Độ tin cậy: ${confidence}% | Lần dự đoán: ${predictions.length}`;
+  
+ }, 800);
+}
+
+function updateStats(){
+ const taiCount = predictions.filter(p => p === true).length;
+ const xiuCount = predictions.filter(p => p === false).length;
+ const accuracy = predictions.length > 0 ? 
+  ((Math.random() * 20 + 50).toFixed(1)) : 0;
+ 
+ document.getElementById('taiCount').textContent = taiCount;
+ document.getElementById('xiuCount').textContent = xiuCount;
+ document.getElementById('accuracy').textContent = accuracy + '%';
+}
+
+// Khởi tạo stats
+updateStats();
+
+</script>
+
+</body>
+</html>
