@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Sunwin Robot Overlay - Click Để Chạy</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #050816 0%, #0a0e27 50%, #1a0033 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.setup-container {
+  max-width: 600px;
+  background: rgba(10, 14, 39, 0.9);
+  border: 3px solid #ff00ff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+  text-align: center;
+}
+
+.setup-container h1 {
+  font-size: 32px;
+  color: #ff00ff;
+  margin-bottom: 20px;
+}
+
+.setup-container p {
+  color: #ccc;
+  margin-bottom: 30px;
+  line-height: 1.8;
+}
+
+.big-button {
+  padding: 20px 50px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  border: none;
+  border-radius: 15px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin: 20px 10px;
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.4);
+}
+
+.big-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 50px rgba(0, 234, 255, 0.8);
+}
+
+.warning {
+  background: rgba(255, 193, 7, 0.1);
+  border: 2px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  color: #ffc107;
+  font-size: 14px;
+}
+
+#status {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #00ff00;
+  min-height: 30px;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ff00ff;
+  color: #888;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div class="setup-container">
+  <h1>🔮 SUNWIN ROBOT</h1>
+  
+  <p>
+    Robot phân tích Tài/Xỉu chạy dưới dạng overlay<br>
+    <strong>Bấm nút bên dưới để chạy Robot!</strong>
+  </p>
+
+  <button class="big-button" onclick="startRobot()">
+    ▶️ CHẠY ROBOT NGAY
+  </button>
+
+  <button class="big-button" style="background: linear-gradient(90deg, #00eaff, #00ff00);" onclick="goToSunwin()">
+    🎮 VÀO SUNWIN.SHOW
+  </button>
+
+  <div class="warning">
+    ⚠️ <strong>HƯỚNG DẪN:</strong><br>
+    1. Click "CHẠY ROBOT NGAY"<br>
+    2. Panel sẽ hiển thị ở góc phải<br>
+    3. Click "TÀI" hoặc "XỈU" sau mỗi phiên<br>
+    4. Xem gợi ý cược tự động
+  </div>
+
+  <div id="status"></div>
+
+  <div class="footer">
+    Made with ❤️ for Sunwin Players
+  </div>
+</div>
+
+<script>
+function startRobot() {
+  const status = document.getElementById('status');
+  status.textContent = '⏳ Đang khởi động Robot...';
+  
+  setTimeout(() => {
+    injectRobot();
+    status.textContent = '✅ Robot đã chạy! Panel sẽ xuất hiện ở góc phải màn hình';
+  }, 500);
+}
+
+function goToSunwin() {
+  window.open('https://sunwin.show/', '_blank');
+}
+
+function injectRobot() {
+  // Tạo code robot
+  const robotCode = `
+    (function() {
+      'use strict';
+      
+      let predictionHistory = [];
+      const MAX_HISTORY = 100;
+
+      function createPanel() {
+        if (document.getElementById('robot-overlay-panel')) {
+          document.getElementById('robot-overlay-panel').style.display = 'block';
+          return;
+        }
+
+        const panel = document.createElement('div');
+        panel.id = 'robot-overlay-panel';
+        panel.innerHTML = \`
+          <div class="robot-header">
+            <div class="robot-title">🔮 TÀI XỈU ROBOT</div>
+            <div class="robot-controls">
+              <button id="robot-min" class="robot-btn">−</button>
+              <button id="robot-close" class="robot-btn">✕</button>
+            </div>
+          </div>
+
+          <div class="robot-body">
+            <div class="robot-stats">
+              <div class="robot-stat">
+                <div class="robot-label">📈 TÀI</div>
+                <div class="robot-value" id="robot-tai-pct">0%</div>
+                <div class="robot-count" id="robot-tai-count">0</div>
+              </div>
+              <div class="robot-stat">
+                <div class="robot-label">📉 XỈU</div>
+                <div class="robot-value" id="robot-xiu-pct">0%</div>
+                <div class="robot-count" id="robot-xiu-count">0</div>
+              </div>
+            </div>
+
+            <div class="robot-rec">
+              <div class="robot-rec-label">💡 GỢI Ý:</div>
+              <div class="robot-rec-text" id="robot-rec">Chưa có</div>
+            </div>
+
+            <div class="robot-chart">
+              <div class="robot-bar"><div class="robot-bar-tai" id="robot-bar-tai" style="width:0%"></div></div>
+              <div class="robot-bar"><div class="robot-bar-xiu" id="robot-bar-xiu" style="width:0%"></div></div>
+            </div>
+
+            <div class="robot-history" id="robot-history">
+              <span style="color:#aaa;font-size:10px;">Chưa có</span>
+            </div>
+
+            <div class="robot-buttons">
+              <button id="robot-tai-btn" class="robot-btn-add">TÀI</button>
+              <button id="robot-xiu-btn" class="robot-btn-add">XỈU</button>
+              <button id="robot-reset-btn" class="robot-btn-reset">RESET</button>
+            </div>
+          </div>
+        \`;
+
+        document.body.appendChild(panel);
+        addRobotStyles();
+        attachRobotEvents();
+        loadRobotData();
+        updateRobotDisplay();
+      }
+
+      function addRobotStyles() {
+        if (document.getElementById('robot-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'robot-styles';
+        style.textContent = \`
+          #robot-overlay-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: linear-gradient(135deg, rgba(10,14,39,0.95), rgba(26,0,51,0.95));
+            border: 2px solid #ff00ff;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(255,0,255,0.6);
+            z-index: 999999;
+            color: white;
+            font-family: Arial;
+          }
+
+          .robot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,0,255,0.15);
+            border-bottom: 1px solid #ff00ff;
+            border-radius: 10px 10px 0 0;
+            cursor: move;
+          }
+
+          .robot-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff00ff;
+          }
+
+          .robot-controls {
+            display: flex;
+            gap: 5px;
+          }
+
+          .robot-btn {
+            width: 24px;
+            height: 24px;
+            background: rgba(0,234,255,0.2);
+            border: 1px solid #00eaff;
+            color: #00eaff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+          }
+
+          .robot-btn:hover {
+            background: #00eaff;
+            color: #000;
+          }
+
+          .robot-body {
+            padding: 12px;
+          }
+
+          .robot-stats {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+          }
+
+          .robot-stat {
+            flex: 1;
+            background: rgba(0,234,255,0.1);
+            border: 1px solid #00eaff;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+          }
+
+          .robot-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 5px;
+          }
+
+          .robot-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00eaff;
+          }
+
+          .robot-count {
+            font-size: 9px;
+            color: #666;
+            margin-top: 3px;
+          }
+
+          .robot-rec {
+            background: rgba(255,0,255,0.1);
+            border: 1px solid #ff00ff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+          }
+
+          .robot-rec-label {
+            color: #ff00ff;
+            font-size: 9px;
+            margin-bottom: 5px;
+          }
+
+          .robot-rec-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00ff00;
+          }
+
+          .robot-chart {
+            margin-bottom: 10px;
+          }
+
+          .robot-bar {
+            height: 18px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 3px;
+            margin-bottom: 5px;
+            overflow: hidden;
+          }
+
+          .robot-bar-tai {
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+          }
+
+          .robot-bar-xiu {
+            background: linear-gradient(90deg, #ff6b6b, #ff0000);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+          }
+
+          .robot-history {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            min-height: 24px;
+            background: rgba(0,234,255,0.05);
+            border: 1px dashed #00eaff;
+            border-radius: 6px;
+            padding: 6px;
+          }
+
+          .robot-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 1px solid;
+          }
+
+          .robot-dot.tai {
+            background: rgba(0,255,0,0.2);
+            border-color: #00ff00;
+          }
+
+          .robot-dot.xiu {
+            background: rgba(255,107,107,0.2);
+            border-color: #ff6b6b;
+          }
+
+          .robot-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+          }
+
+          .robot-btn-add {
+            padding: 8px;
+            background: linear-gradient(90deg, #ff00ff, #00eaff);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s;
+          }
+
+          .robot-btn-add:hover {
+            transform: scale(1.05);
+          }
+
+          .robot-btn-reset {
+            padding: 8px;
+            background: rgba(255,0,0,0.3);
+            border: 1px solid #ff6b6b;
+            border-radius: 6px;
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+          }
+
+          .robot-btn-reset:hover {
+            background: rgba(255,0,0,0.5);
+          }
+
+          .robot-minimized .robot-body {
+            display: none;
+          }
+        \`;
+        
+        document.head.appendChild(style);
+      }
+
+      function attachRobotEvents() {
+        document.getElementById('robot-tai-btn').addEventListener('click', () => addRobotResult('tai'));
+        document.getElementById('robot-xiu-btn').addEventListener('click', () => addRobotResult('xiu'));
+        document.getElementById('robot-reset-btn').addEventListener('click', resetRobotData);
+        document.getElementById('robot-close').addEventListener('click', closeRobotPanel);
+        document.getElementById('robot-min').addEventListener('click', toggleRobotMinimize);
+        makePanelDraggable();
+      }
+
+      function addRobotResult(type) {
+        if (predictionHistory.length >= MAX_HISTORY) {
+          predictionHistory.shift();
+        }
+        predictionHistory.push(type);
+        saveRobotData();
+        updateRobotDisplay();
+      }
+
+      function updateRobotDisplay() {
+        if (predictionHistory.length === 0) {
+          document.getElementById('robot-tai-pct').textContent = '0%';
+          document.getElementById('robot-xiu-pct').textContent = '0%';
+          document.getElementById('robot-tai-count').textContent = '0';
+          document.getElementById('robot-xiu-count').textContent = '0';
+          document.getElementById('robot-rec').textContent = 'Chưa có';
+          document.getElementById('robot-bar-tai').style.width = '0%';
+          document.getElementById('robot-bar-xiu').style.width = '0%';
+          document.getElementById('robot-history').innerHTML = '<span style="color:#aaa;font-size:10px;">Chưa có</span>';
+          return;
+        }
+
+        const taiCount = predictionHistory.filter(r => r === 'tai').length;
+        const xiuCount = predictionHistory.filter(r => r === 'xiu').length;
+        const total = predictionHistory.length;
+        const taiPct = Math.round((taiCount / total) * 100);
+        const xiuPct = Math.round((xiuCount / total) * 100);
+
+        document.getElementById('robot-tai-pct').textContent = taiPct + '%';
+        document.getElementById('robot-xiu-pct').textContent = xiuPct + '%';
+        document.getElementById('robot-tai-count').textContent = taiCount;
+        document.getElementById('robot-xiu-count').textContent = xiuCount;
+
+        document.getElementById('robot-bar-tai').style.width = taiPct + '%';
+        document.getElementById('robot-bar-xiu').style.width = xiuPct + '%';
+
+        let rec = '⚖️ Cân bằng';
+        if (taiPct > xiuPct + 5) {
+          rec = '➕ ĐẶT TÀI';
+        } else if (xiuPct > taiPct + 5) {
+          rec = '➖ ĐẶT XỈU';
+        }
+        document.getElementById('robot-rec').textContent = rec;
+
+        const recent = predictionHistory.slice(-8);
+        const historyHTML = recent.map(item => \`<div class="robot-dot \${item}">\${item === 'tai' ? '⬆️' : '⬇️'}</div>\`).join('');
+        document.getElementById('robot-history').innerHTML = historyHTML;
+      }
+
+      function resetRobotData() {
+        if (confirm('Xóa tất cả dữ liệu?')) {
+          predictionHistory = [];
+          saveRobotData();
+          updateRobotDisplay();
+        }
+      }
+
+      function closeRobotPanel() {
+        document.getElementById('robot-overlay-panel').remove();
+      }
+
+      function toggleRobotMinimize() {
+        document.getElementById('robot-overlay-panel').classList.toggle('robot-minimized');
+      }
+
+      function saveRobotData() {
+        localStorage.setItem('sunwin-robot-data', JSON.stringify(predictionHistory));
+      }
+
+      function loadRobotData() {
+        const saved = localStorage.getItem('sunwin-robot-data');
+        if (saved) {
+          predictionHistory = JSON.parse(saved);
+        }
+      }
+
+      function makePanelDraggable() {
+        const panel = document.getElementById('robot-overlay-panel');
+        const header = document.querySelector('.robot-header');
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        header.onmousedown = function(e) {
+          e.preventDefault();
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = function() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+          };
+          document.onmousemove = function(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            panel.style.top = (panel.offsetTop - pos2) + 'px';
+            panel.style.right = 'auto';
+            panel.style.left = (panel.offsetLeft - pos1) + 'px';
+          };
+        };
+      }
+
+      createPanel();
+    })();
+  `;
+
+  // Chạy code
+  eval(robotCode);
+}
+</script>
+
+</body>
+</html>
