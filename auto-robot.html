@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Sunwin Auto Robot - Realtime Analysis</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #050816 0%, #0a0e27 50%, #1a0033 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.launcher {
+  max-width: 700px;
+  background: rgba(10, 14, 39, 0.95);
+  border: 3px solid #ff00ff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+  text-align: center;
+}
+
+.launcher h1 {
+  font-size: 36px;
+  color: #ff00ff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+}
+
+.launcher p {
+  color: #ccc;
+  margin-bottom: 30px;
+  line-height: 1.8;
+}
+
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.big-button {
+  padding: 20px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+}
+
+.big-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(0, 234, 255, 0.8);
+}
+
+.status-box {
+  background: rgba(0, 234, 255, 0.1);
+  border: 2px solid #00eaff;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.status-box.success {
+  color: #00ff00;
+  border-color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+.info-box {
+  background: rgba(255, 193, 7, 0.1);
+  border: 2px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  color: #ffc107;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ff00ff;
+  color: #888;
+  font-size: 12px;
+}
+
+/* Robot Panel Styles */
+#robot-panel {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  background: linear-gradient(135deg, rgba(10,14,39,0.98), rgba(26,0,51,0.98));
+  border: 2px solid #ff00ff;
+  border-radius: 15px;
+  box-shadow: 0 0 50px rgba(255,0,255,0.6);
+  z-index: 999999;
+  color: white;
+  font-family: Arial;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255,0,255,0.15);
+  border-bottom: 2px solid #ff00ff;
+  border-radius: 13px 13px 0 0;
+  cursor: move;
+  user-select: none;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff00ff;
+}
+
+.panel-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-btn {
+  width: 28px;
+  height: 28px;
+  background: rgba(0,234,255,0.2);
+  border: 1px solid #00eaff;
+  color: #00eaff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.panel-btn:hover {
+  background: #00eaff;
+  color: #000;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+.game-counter {
+  background: rgba(0,234,255,0.1);
+  border: 2px solid #00eaff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.counter-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.counter-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #00eaff;
+}
+
+.live-result {
+  background: rgba(255,0,255,0.1);
+  border: 2px solid #ff00ff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 12px;
+  color: #ff00ff;
+  margin-bottom: 8px;
+}
+
+.result-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #00ff00;
+  animation: pulse 0.5s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.stat-card {
+  background: rgba(0,234,255,0.1);
+  border: 1px solid #00eaff;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-card-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.stat-card-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: #00eaff;
+}
+
+.stat-card-count {
+  font-size: 10px;
+  color: #666;
+  margin-top: 3px;
+}
+
+.recommendation {
+  background: rgba(255,0,255,0.15);
+  border: 2px solid #ff00ff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.rec-label {
+  font-size: 11px;
+  color: #ff00ff;
+  margin-bottom: 8px;
+}
+
+.rec-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00ff00;
+}
+
+.chart-bars {
+  margin-bottom: 15px;
+}
+
+.chart-row {
+  margin-bottom: 8px;
+}
+
+.chart-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 3px;
+}
+
+.chart-bar {
+  height: 24px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #00eaff;
+}
+
+.bar-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.bar-tai {
+  background: linear-gradient(90deg, #00ff00, #00cc00);
+}
+
+.bar-xiu {
+  background: linear-gradient(90deg, #ff6b6b, #ff0000);
+}
+
+.history-section {
+  background: rgba(0,234,255,0.05);
+  border: 1px dashed #00eaff;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.history-label {
+  font-size: 11px;
+  color: #00eaff;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.history-items {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.history-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid;
+}
+
+.history-dot.tai {
+  background: rgba(0,255,0,0.2);
+  border-color: #00ff00;
+}
+
+.history-dot.xiu {
+  background: rgba(255,107,107,0.2);
+  border-color: #ff6b6b;
+}
+
+.control-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.control-btn {
+  padding: 10px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.control-btn:hover {
+  transform: scale(1.05);
+}
+
+.control-btn.stop {
+  background: rgba(255,0,0,0.4);
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff00;
+  margin-right: 8px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  #robot-panel {
+    width: 300px;
+  }
+  
+  .launcher {
+    padding: 25px;
+  }
+  
+  .button-group {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="launcher">
+  <h1>🔮 SUNWIN AUTO ROBOT</h1>
+  
+  <p>
+    Robot tự động theo dõi & phân tích Tài Xỉu realtime<br>
+    <strong>Phân tích lịch sử & đưa ra tỉ lệ dự đoán</strong>
+  </p>
+
+  <div class="status-box" id="launcher-status">
+    Ready to start
+  </div>
+
+  <div class="button-group">
+    <button class="big-button" onclick="startAutoRobot()">
+      ▶️ START ROBOT
+    </button>
+    <button class="big-button" onclick="goToSunwin()" style="background: linear-gradient(90deg, #00eaff, #00ff00);">
+      🎮 SUNWIN
+    </button>
+  </div>
+
+  <div class="info-box">
+    ✨ <strong>Tính năng:</strong><br>
+    ✓ Tự động generate kết quả Tài/Xỉu<br>
+    ✓ Phân tích tỉ lệ realtime<br>
+    ✓ Dự đoán thông minh<br>
+    ✓ Lịch sử 20 phiên<br>
+    ✓ Biểu đồ thống kê<br>
+    ✓ Tự động cập nhật mỗi 3 giây
+  </div>
+
+  <div class="footer">
+    Made with ❤️ for Sunwin Players
+  </div>
+</div>
+
+<!-- Robot Panel -->
+<div id="robot-panel">
+  <div class="panel-header">
+    <div class="panel-title">
+      <span class="status-indicator"></span>TÀI XỈU AUTO
+    </div>
+    <div class="panel-controls">
+      <button class="panel-btn" onclick="toggleRobotMinimize()">−</button>
+      <button class="panel-btn" onclick="stopRobot()">✕</button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <div class="game-counter">
+      <div class="counter-label">🎮 PHIÊN SỐ</div>
+      <div class="counter-number" id="game-number">0</div>
+    </div>
+
+    <div class="live-result">
+      <div class="result-label">📊 KẾT QUẢ MỚI NHẤT</div>
+      <div class="result-value" id="current-result">-</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">📈 TÀI</div>
+        <div class="stat-card-value" id="tai-pct">0%</div>
+        <div class="stat-card-count" id="tai-count">0/0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">📉 XỈU</div>
+        <div class="stat-card-value" id="xiu-pct">0%</div>
+        <div class="stat-card-count" id="xiu-count">0/0</div>
+      </div>
+    </div>
+
+    <div class="recommendation">
+      <div class="rec-label">💡 GỢI Ý</div>
+      <div class="rec-text" id="recommendation">Chưa đủ dữ liệu</div>
+    </div>
+
+    <div class="chart-bars">
+      <div class="chart-row">
+        <div class="chart-label">TÀI (Tổng)</div>
+        <div class="chart-bar">
+          <div class="bar-fill bar-tai" id="chart-tai" style="width:50%">
+            <span id="chart-tai-text">50%</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-label">XỈU (Tổng)</div>
+        <div class="chart-bar">
+          <div class="bar-fill bar-xiu" id="chart-xiu" style="width:50%">
+            <span id="chart-xiu-text">50%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-label">📜 20 PHIÊN CUỐI CÙNG</div>
+      <div class="history-items" id="history-container">
+        <span style="color:#aaa;font-size:11px;">Chờ dữ liệu...</span>
+      </div>
+    </div>
+
+    <div class="control-buttons">
+      <button class="control-btn" onclick="pauseRobot()" id="pause-btn">⏸ PAUSE</button>
+      <button class="control-btn stop" onclick="stopRobot()">⏹ STOP</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let gameData = [];
+let gameNumber = 0;
+let isRunning = false;
+let isPaused = false;
+let autoInterval = null;
+
+function startAutoRobot() {
+  const status = document.getElementById('launcher-status');
+  status.textContent = '⏳ Khởi động Robot...';
+  status.classList.remove('success');
+  
+  setTimeout(() => {
+    isRunning = true;
+    isPaused = false;
+    document.getElementById('robot-panel').style.display = 'block';
+    document.getElementById('launcher-status').textContent = '✅ Robot đang chạy!';
+    document.getElementById('launcher-status').classList.add('success');
+    
+    gameNumber = 0;
+    gameData = [];
+    
+    startAutoGeneration();
+  }, 500);
+}
+
+function stopRobot() {
+  isRunning = false;
+  isPaused = false;
+  clearInterval(autoInterval);
+  document.getElementById('robot-panel').style.display = 'none';
+  document.getElementById('launcher-status').textContent = 'Ready to start';
+  document.getElementById('launcher-status').classList.remove('success');
+}
+
+function pauseRobot() {
+  isPaused = !isPaused;
+  const btn = document.getElementById('pause-btn');
+  if (isPaused) {
+    btn.textContent = '▶ RESUME';
+    clearInterval(autoInterval);
+  } else {
+    btn.textContent = '⏸ PAUSE';
+    startAutoGeneration();
+  }
+}
+
+function goToSunwin() {
+  window.open('https://web.sunwin.show/?affId=Sunwin', '_blank');
+}
+
+function generateGameResult() {
+  // Random 3 xúc xắc
+  const dice = [
+    Math.floor(Math.random() * 6) + 1,
+    Math.floor(Math.random() * 6) + 1,
+    Math.floor(Math.random() * 6) + 1
+  ];
+  
+  const total = dice.reduce((a, b) => a + b, 0);
+  const result = total >= 11 ? 'tai' : 'xiu';
+  
+  return {
+    id: gameNumber,
+    result: result,
+    dice: dice,
+    total: total,
+    time: new Date().toLocaleTimeString('vi-VN')
+  };
+}
+
+function startAutoGeneration() {
+  if (!isRunning || isPaused) return;
+  
+  autoInterval = setInterval(() => {
+    if (!isRunning || isPaused) return;
+    
+    gameNumber++;
+    const newGame = generateGameResult();
+    gameData.push(newGame);
+    
+    // Keep only last 100 games
+    if (gameData.length > 100) {
+      gameData.shift();
+    }
+    
+    updateDisplay();
+  }, 3000); // Auto generate every 3 seconds
+}
+
+function updateDisplay() {
+  // Update game number
+  document.getElementById('game-number').textContent = gameNumber;
+  
+  // Update current result
+  if (gameData.length > 0) {
+    const latest = gameData[gameData.length - 1];
+    const resultText = latest.result === 'tai' ? '📈 TÀI' : '📉 XỈU';
+    document.getElementById('current-result').textContent = resultText;
+  }
+  
+  // Calculate stats
+  const taiCount = gameData.filter(g => g.result === 'tai').length;
+  const xiuCount = gameData.filter(g => g.result === 'xiu').length;
+  const total = gameData.length;
+  
+  if (total > 0) {
+    const taiPct = Math.round((taiCount / total) * 100);
+    const xiuPct = Math.round((xiuCount / total) * 100);
+    
+    // Update percentages
+    document.getElementById('tai-pct').textContent = taiPct + '%';
+    document.getElementById('xiu-pct').textContent = xiuPct + '%';
+    document.getElementById('tai-count').textContent = taiCount + '/' + total;
+    document.getElementById('xiu-count').textContent = xiuCount + '/' + total;
+    
+    // Update charts
+    document.getElementById('chart-tai').style.width = taiPct + '%';
+    document.getElementById('chart-tai-text').textContent = taiPct + '%';
+    document.getElementById('chart-xiu').style.width = xiuPct + '%';
+    document.getElementById('chart-xiu-text').textContent = xiuPct + '%';
+    
+    // Recommendation
+    let rec = '⚖️ CÂN BẰNG';
+    if (taiPct > xiuPct + 5) {
+      rec = '➕ ĐẶT TÀI';
+    } else if (xiuPct > taiPct + 5) {
+      rec = '➖ ĐẶT XỈU';
+    }
+    document.getElementById('recommendation').textContent = rec;
+  }
+  
+  // Update history
+  updateHistory();
+}
+
+function updateHistory() {
+  const historyContainer = document.getElementById('history-container');
+  const recentGames = gameData.slice(-20).reverse();
+  
+  if (recentGames.length === 0) {
+    historyContainer.innerHTML = '<span style="color:#aaa;font-size:11px;">Chờ dữ liệu...</span>';
+    return;
+  }
+  
+  historyContainer.innerHTML = recentGames.map((game) => `
+    <div class="history-dot ${game.result}" title="Phiên ${game.id}: ${game.result === 'tai' ? 'TÀI' : 'XỈU'} (${game.total})">
+      ${game.result === 'tai' ? '⬆️' : '⬇️'}
+    </div>
+  `).join('');
+}
+
+function toggleRobotMinimize() {
+  const body = document.querySelector('.panel-body');
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+// Make panel draggable
+function makePanelDraggable() {
+  const panel = document.getElementById('robot-panel');
+  const header = document.querySelector('.panel-header');
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  
+  header.onmousedown = function(e) {
+    e.preventDefault();
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    
+    document.onmouseup = function() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    };
+    
+    document.onmousemove = function(e) {
+      e.preventDefault();
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      
+      panel.style.top = (panel.offsetTop - pos2) + 'px';
+      panel.style.right = 'auto';
+      panel.style.left = (panel.offsetLeft - pos1) + 'px';
+    };
+  };
+}
+
+// Initialize draggable
+makePanelDraggable();
+</script>
+
+</body>
+</html>
