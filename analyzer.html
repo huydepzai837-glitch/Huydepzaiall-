@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunwin Tài Xỉu Analyzer</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #050816 0%, #0a0e27 50%, #1a0033 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px;
+  background: rgba(255, 0, 255, 0.05);
+  border: 2px solid #ff00ff;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+}
+
+header h1 {
+  font-size: 36px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+
+header p {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: linear-gradient(135deg, rgba(6, 29, 43, 0.8), rgba(25, 0, 43, 0.8));
+  border: 2px solid #00eaff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.2);
+}
+
+.card h2 {
+  color: #00eaff;
+  margin-bottom: 20px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  background: rgba(0, 234, 255, 0.1);
+  border: 2px solid #00eaff;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #00eaff;
+}
+
+.stat-count {
+  font-size: 11px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.recommendation-card {
+  background: rgba(255, 0, 255, 0.1);
+  border: 2px solid #ff00ff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.rec-label {
+  color: #ff00ff;
+  font-size: 12px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.rec-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ff00;
+  margin-bottom: 8px;
+}
+
+.confidence {
+  font-size: 12px;
+  color: #888;
+}
+
+.history-section {
+  background: rgba(0, 234, 255, 0.05);
+  border: 1px solid #00eaff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.history-label {
+  font-size: 12px;
+  color: #00eaff;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.history-items {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 2px solid;
+  transition: 0.3s;
+}
+
+.history-item.tai {
+  background: rgba(0, 255, 0, 0.2);
+  border-color: #00ff00;
+}
+
+.history-item.xiu {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: #ff6b6b;
+}
+
+.history-item:hover {
+  transform: scale(1.1);
+}
+
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+button {
+  padding: 15px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 234, 255, 0.6);
+}
+
+.link-section {
+  background: rgba(255, 0, 255, 0.05);
+  border: 2px solid #ff00ff;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.link-section h3 {
+  color: #ff00ff;
+  margin-bottom: 15px;
+}
+
+.link-button {
+  display: inline-block;
+  padding: 15px 40px;
+  background: linear-gradient(90deg, #ff00ff, #00eaff);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.link-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.8);
+}
+
+.info-box {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #ffc107;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  header h1 {
+    font-size: 24px;
+  }
+  
+  .button-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.chart-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chart-label {
+  width: 60px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.bar {
+  flex: 1;
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.bar-tai {
+  background: linear-gradient(90deg, #00ff00, #00cc00);
+}
+
+.bar-xiu {
+  background: linear-gradient(90deg, #ff6b6b, #ff0000);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <h1>🔮 SUNWIN TÀI XỈU ANALYZER</h1>
+    <p>Phân tích tỉ lệ Tài/Xỉu & gợi ý cược thông minh</p>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Analysis Card -->
+    <div class="card">
+      <h2>📊 Phân Tích Thực Thời</h2>
+      
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">📈 TÀI</div>
+          <div class="stat-value" id="tai-percentage">0%</div>
+          <div class="stat-count" id="tai-count">0 lần</div>
+        </div>
+        
+        <div class="stat-box">
+          <div class="stat-label">📉 XỈU</div>
+          <div class="stat-value" id="xiu-percentage">0%</div>
+          <div class="stat-count" id="xiu-count">0 lần</div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-bar">
+          <div class="chart-label">TÀI</div>
+          <div class="bar bar-tai" id="tai-bar" style="width: 0%"></div>
+        </div>
+        <div class="chart-bar">
+          <div class="chart-label">XỈU</div>
+          <div class="bar bar-xiu" id="xiu-bar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendation Card -->
+    <div class="card">
+      <h2>💡 Gợi Ý Cược</h2>
+      
+      <div class="recommendation-card">
+        <div class="rec-label">KHUYẾN NGHỊ:</div>
+        <div class="rec-text" id="recommendation">Chưa có dữ liệu</div>
+        <div class="confidence" id="confidence">Độ tin cậy: 0%</div>
+      </div>
+
+      <div class="history-section">
+        <div class="history-label">📊 10 Phiên Gần Nhất</div>
+        <div class="history-items" id="history-items">
+          <span style="color: #aaa; font-size: 12px;">Chưa có dữ liệu</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Section -->
+  <div class="card">
+    <h2>🎮 Nhập Kết Quả</h2>
+    
+    <div class="button-group">
+      <button onclick="addResult('tai')">➕ TÀI</button>
+      <button onclick="addResult('xiu')">➖ XỈU</button>
+      <button onclick="resetData()">🔄 RESET</button>
+    </div>
+
+    <div class="info-box">
+      ⚠️ <strong>Lưu ý:</strong> Đây là công cụ phân tích thống kê. Không thể dự đoán chính xác kết quả. Dùng để tham khảo và quản lý vốn, không phải phương pháp chắc chắn.
+    </div>
+  </div>
+
+  <!-- Link to Sunwin -->
+  <div class="link-section">
+    <h3>🎯 Vào Game Sunwin</h3>
+    <a href="https://sunwin.show/" target="_blank" class="link-button">
+      🚀 VÀO SUNWIN
+    </a>
+  </div>
+</div>
+
+<script>
+let predictionHistory = [];
+const MAX_HISTORY = 100;
+
+// Tải dữ liệu từ localStorage
+function loadData() {
+  const saved = localStorage.getItem('taixiu-analyzer');
+  if (saved) {
+    predictionHistory = JSON.parse(saved);
+    updateStats();
+  }
+}
+
+// Lưu dữ liệu vào localStorage
+function saveData() {
+  localStorage.setItem('taixiu-analyzer', JSON.stringify(predictionHistory));
+}
+
+// Thêm kết quả
+function addResult(type) {
+  if (predictionHistory.length >= MAX_HISTORY) {
+    predictionHistory.shift();
+  }
+  predictionHistory.push(type);
+  saveData();
+  updateStats();
+}
+
+// Cập nhật thống kê
+function updateStats() {
+  if (predictionHistory.length === 0) {
+    resetDisplay();
+    return;
+  }
+
+  const taiCount = predictionHistory.filter(r => r === 'tai').length;
+  const xiuCount = predictionHistory.filter(r => r === 'xiu').length;
+  const total = predictionHistory.length;
+
+  const taiPercentage = Math.round((taiCount / total) * 100);
+  const xiuPercentage = Math.round((xiuCount / total) * 100);
+
+  // Cập nhật phần trăm
+  document.getElementById('tai-percentage').textContent = taiPercentage + '%';
+  document.getElementById('xiu-percentage').textContent = xiuPercentage + '%';
+  document.getElementById('tai-count').textContent = taiCount + ' lần';
+  document.getElementById('xiu-count').textContent = xiuCount + ' lần';
+
+  // Biểu đồ
+  document.getElementById('tai-bar').style.width = taiPercentage + '%';
+  document.getElementById('tai-bar').textContent = taiPercentage + '%';
+  document.getElementById('xiu-bar').style.width = xiuPercentage + '%';
+  document.getElementById('xiu-bar').textContent = xiuPercentage + '%';
+
+  // Gợi ý
+  let recommendation = '';
+  let confidence = '';
+
+  if (taiPercentage > xiuPercentage + 5) {
+    recommendation = '➕ NÊN ĐẶT TÀI';
+    confidence = `Độ tin cậy: ${Math.min(taiPercentage - 50, 80)}%`;
+  } else if (xiuPercentage > taiPercentage + 5) {
+    recommendation = '➖ NÊN ĐẶT XỈU';
+    confidence = `Độ tin cậy: ${Math.min(xiuPercentage - 50, 80)}%`;
+  } else {
+    recommendation = '⚖️ CÂN BẰNG - RỦI RO CAO';
+    confidence = 'Độ tin cậy: < 50% ⚠️';
+  }
+
+  document.getElementById('recommendation').textContent = recommendation;
+  document.getElementById('confidence').textContent = confidence;
+
+  updateHistoryDisplay();
+}
+
+// Hiển thị lịch sử
+function updateHistoryDisplay() {
+  const container = document.getElementById('history-items');
+  const recentHistory = predictionHistory.slice(-10).reverse();
+
+  container.innerHTML = recentHistory.map((item) => `
+    <div class="history-item ${item}">
+      ${item === 'tai' ? '⬆️' : '⬇️'}
+    </div>
+  `).join('');
+}
+
+// Reset
+function resetData() {
+  if (confirm('Bạn chắc chắn muốn xóa tất cả dữ liệu?')) {
+    predictionHistory = [];
+    saveData();
+    resetDisplay();
+  }
+}
+
+// Reset giao diện
+function resetDisplay() {
+  document.getElementById('tai-percentage').textContent = '0%';
+  document.getElementById('xiu-percentage').textContent = '0%';
+  document.getElementById('tai-count').textContent = '0 lần';
+  document.getElementById('xiu-count').textContent = '0 lần';
+  document.getElementById('recommendation').textContent = 'Chưa có dữ liệu';
+  document.getElementById('confidence').textContent = 'Độ tin cậy: 0%';
+  document.getElementById('tai-bar').style.width = '0%';
+  document.getElementById('xiu-bar').style.width = '0%';
+  document.getElementById('history-items').innerHTML = '<span style="color: #aaa; font-size: 12px;">Chưa có dữ liệu</span>';
+}
+
+// Khởi tạo
+window.addEventListener('load', loadData);
+</script>
+
+</body>
+</html>
